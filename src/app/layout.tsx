@@ -5,6 +5,7 @@ import NextTopLoader from 'nextjs-toploader';
 import { getLocale } from 'next-intl/server';
 import RootProvider from '@/providers/root-provider';
 import { Toaster } from '@/components/ui/sonner';
+import AppConfig from '@/lib/app-config';
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -16,9 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Mailora - AI Email Writing Assistant',
-  description:
-    'Mailora is an AI email writing assistant that helps you write better, faster, and with more confidence. It uses advanced AI algorithms to understand your writing style and provide personalized suggestions.',
+  title: AppConfig.title,
+  description: AppConfig.descriptions,
 };
 
 export default async function RootLayout({
