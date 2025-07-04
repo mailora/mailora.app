@@ -1,13 +1,11 @@
-import './globals.css';
-
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { getLocale } from 'next-intl/server';
+import './globals.css';
 import NextTopLoader from 'nextjs-toploader';
-
+import { getLocale } from 'next-intl/server';
+import RootProvider from '@/providers/root-provider';
 import { Toaster } from '@/components/ui/sonner';
 import AppConfig from '@/lib/app-config';
-import RootProvider from '@/providers/root-provider';
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],

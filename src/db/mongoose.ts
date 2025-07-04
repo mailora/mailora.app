@@ -19,6 +19,7 @@ interface CachedMongoose {
 
 // Add mongoose to the NodeJS global type
 declare global {
+   
   var mongoose: CachedMongoose | undefined;
 }
 
