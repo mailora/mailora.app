@@ -15,8 +15,15 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     MICROSOFT_CLIENT_ID: z.string(),
     MICROSOFT_CLIENT_SECRET: z.string(),
+    AWS_REGION: z.string(),
+    AWS_ENDPOINT_URL_S3: z.string(),
+    AWS_ACCESS_KEY_ID: z.string(),
+    AWS_SECRET_ACCESS_KEY: z.string(),
   },
-  client: {},
+  client: {
+    NEXT_PUBLIC_AUTH_URL: z.string().url().default('http://localhost:3000'),
+    NEXT_PUBLIC_APP_DOMAIN: z.string().url().default('http://localhost:3000'),
+  },
   runtimeEnv: {
     APP_NAME: process.env.APP_NAME,
     APP_DOMAIN: process.env.APP_DOMAIN,
@@ -30,5 +37,11 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
     MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
+    AWS_REGION: process.env.AWS_REGION,
+    AWS_ENDPOINT_URL_S3: process.env.AWS_ENDPOINT_URL_S3,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    NEXT_PUBLIC_AUTH_URL: process.env.NEXT_PUBLIC_AUTH_URL,
+    NEXT_PUBLIC_APP_DOMAIN: process.env.NEXT_PUBLIC_APP_DOMAIN,
   },
 });

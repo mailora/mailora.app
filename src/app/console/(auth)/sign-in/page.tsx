@@ -5,7 +5,7 @@ import { Mail, ArrowLeft } from 'lucide-react';
 
 export default function AuthPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="flex items-center justify-center mb-8">
           <Link
@@ -22,12 +22,12 @@ export default function AuthPage() {
             <div className="flex items-center justify-center mb-4">
               <Mail className="h-8 w-8 text-blue-600" />
             </div>
-            <CardTitle className="text-2xl">Welcome to EmailAI</CardTitle>
+            <CardTitle className="text-2xl">Welcome to Mailora</CardTitle>
             <CardDescription>Sign in to your account</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Google Sign In */}
-            <Link href="/dashboard">
+            <Link href="/">
               <Button variant="outline" className="w-full h-12 text-base bg-transparent">
                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                   <path
@@ -52,7 +52,7 @@ export default function AuthPage() {
             </Link>
 
             {/* Microsoft Sign In */}
-            <Link href="/dashboard">
+            <Link href="/">
               <Button variant="outline" className="w-full h-12 text-base bg-transparent">
                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                   <path fill="#f25022" d="M1 1h10v10H1z" />

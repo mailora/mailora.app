@@ -25,7 +25,7 @@ export default function SettingsPage() {
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link
-              href="/dashboard"
+              href="/"
               className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />
