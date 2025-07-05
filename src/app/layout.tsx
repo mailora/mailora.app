@@ -1,40 +1,28 @@
+import type React from 'react';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './globals.css';
-import NextTopLoader from 'nextjs-toploader';
-import { getLocale } from 'next-intl/server';
-import RootProvider from '@/providers/root-provider';
-import { Toaster } from '@/components/ui/sonner';
-import AppConfig from '@/lib/app-config';
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
+import { ThemeProvider } from '@/components/theme-provider';
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: AppConfig.title,
-  description: AppConfig.descriptions,
+  title: 'EmailAI - Generate Perfect Emails with AI',
+  description: 'Create professional, personalized emails in seconds with AI',
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const locale = await getLocale();
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <RootProvider>
-          <NextTopLoader color="hsl(var(--primary))" />
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           {children}
-          <Toaster richColors />
-        </RootProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
