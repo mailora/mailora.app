@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, Settings, CreditCard, LogOut } from 'lucide-react';
+import { User, Settings, CreditCard, LogOut, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/providers/auth-provider';
 
@@ -25,13 +25,23 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={user.image || '/placeholder.svg?height=32&width=32'} alt="User" />
-            <AvatarFallback className="text-xs">
-              {user.name ? user.name.slice(0, 2).toUpperCase() : 'U'}
-            </AvatarFallback>
-          </Avatar>
+        <Button
+          variant="ghost"
+          className="relative h-10 w-auto px-3 py-2 hover:bg-accent hover:text-accent-foreground focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <div className="flex items-center space-x-3">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user.image || '/placeholder.svg?height=32&width=32'} alt="User" />
+              <AvatarFallback className="text-xs">
+                {user.name ? user.name.slice(0, 2).toUpperCase() : 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="hidden sm:flex flex-col items-start">
+              <p className="text-sm font-medium leading-none">{user.name || 'User'}</p>
+              <p className="text-xs text-muted-foreground leading-none mt-1">{user.email}</p>
+            </div>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          </div>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -63,7 +73,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={signOut} className="flex items-center">
+        <DropdownMenuItem onClick={() => signOut.mutate()} className="flex items-center">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Logout</span>
         </DropdownMenuItem>

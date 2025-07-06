@@ -1,47 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/providers/auth-provider';
-import { authClient } from '@/lib/auth-client';
-import { toast } from 'sonner';
 
 export function ProfileForm() {
-  const { user } = useAuth();
-  const [isUpdating, setIsUpdating] = useState(false);
+  const { user, updateUser } = useAuth();
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
   });
 
+  // Update form data when user data changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+      });
+    }
+  }, [user]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    try {
-      setIsUpdating(true);
-
-      // Update user profile using better-auth
-      await authClient.updateUser({
-        name: formData.name,
-        // Note: Email updates might require verification
-      });
-
-      // Show success message
-      toast.success('Profile updated successfully!', {
-        description: 'Your profile information has been saved.',
-      });
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('Failed to update profile', {
-        description: 'Please try again. If the problem persists, contact support.',
-      });
-    } finally {
-      setIsUpdating(false);
-    }
+    updateUser.mutate({
+      name: formData.name,
+      // Note: Email updates might require verification
+    });
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -105,8 +95,8 @@ export function ProfileForm() {
         </div>
       </div>
 
-      <Button type="submit" disabled={isUpdating}>
-        {isUpdating ? 'Updating...' : 'Save Changes'}
+      <Button type="submit" disabled={updateUser.isLoading}>
+        {updateUser.isLoading ? 'Updating...' : 'Save Changes'}
       </Button>
     </form>
   );

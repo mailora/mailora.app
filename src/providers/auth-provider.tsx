@@ -1,7 +1,16 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { authClient } from '@/lib/auth-client';
+import React, { createContext, useContext } from 'react';
+import {
+  useAuth as useAuthQuery,
+  useSession as useSessionQuery,
+  useUser as useUserQuery,
+  useSignInMutation,
+  useSignOutMutation,
+  useLinkAccountMutation,
+  useUnlinkAccountMutation,
+  useUpdateUserMutation,
+} from '@/hooks/use-auth-queries';
 import { User, Session } from '@/lib/auth';
 
 interface AuthContextType {
@@ -10,94 +19,62 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   signIn: {
-    social: (params: { provider: string }) => Promise<void>;
+    social: (params: { provider: string }) => void;
+    isLoading: boolean;
   };
-  signOut: () => Promise<void>;
-  linkAccount: (params: { provider: string }) => Promise<void>;
+  signOut: {
+    mutate: () => void;
+    isLoading: boolean;
+  };
+  linkAccount: {
+    mutate: (params: { provider: string }) => void;
+    isLoading: boolean;
+  };
+  unlinkAccount: {
+    mutate: (params: { provider: string }) => void;
+    isLoading: boolean;
+  };
+  updateUser: {
+    mutate: (userData: { name?: string; email?: string }) => void;
+    isLoading: boolean;
+  };
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const sessionData = await authClient.getSession();
-        if (sessionData.data) {
-          setSession(sessionData.data);
-          setUser(sessionData.data.user);
-        }
-      } catch (error) {
-        console.error('Auth initialization error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initAuth();
-  }, []);
-
-  const signIn = {
-    social: async (params: { provider: string }) => {
-      try {
-        setIsLoading(true);
-        await authClient.signIn.social(params);
-        // After successful sign in, refresh session
-        const sessionData = await authClient.getSession();
-        if (sessionData.data) {
-          setSession(sessionData.data);
-          setUser(sessionData.data.user);
-        }
-      } catch (error) {
-        console.error('Sign in error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-  };
-
-  const signOut = async () => {
-    try {
-      setIsLoading(true);
-      await authClient.signOut();
-      setSession(null);
-      setUser(null);
-    } catch (error) {
-      console.error('Sign out error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const linkAccount = async (params: { provider: string }) => {
-    try {
-      setIsLoading(true);
-      await authClient.linkSocial(params);
-      // Refresh session after linking
-      const sessionData = await authClient.getSession();
-      if (sessionData.data) {
-        setSession(sessionData.data);
-        setUser(sessionData.data.user);
-      }
-    } catch (error) {
-      console.error('Link account error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const auth = useAuthQuery();
+  const signInMutation = useSignInMutation();
+  const signOutMutation = useSignOutMutation();
+  const linkAccountMutation = useLinkAccountMutation();
+  const unlinkAccountMutation = useUnlinkAccountMutation();
+  const updateUserMutation = useUpdateUserMutation();
 
   const value: AuthContextType = {
-    session,
-    user,
-    isLoading,
-    isAuthenticated: !!session,
-    signIn,
-    signOut,
-    linkAccount,
+    session: auth.session || null,
+    user: auth.user || null,
+    isLoading: auth.isLoading,
+    isAuthenticated: auth.isAuthenticated,
+    signIn: {
+      social: signInMutation.mutate,
+      isLoading: signInMutation.isPending,
+    },
+    signOut: {
+      mutate: signOutMutation.mutate,
+      isLoading: signOutMutation.isPending,
+    },
+    linkAccount: {
+      mutate: linkAccountMutation.mutate,
+      isLoading: linkAccountMutation.isPending,
+    },
+    unlinkAccount: {
+      mutate: unlinkAccountMutation.mutate,
+      isLoading: unlinkAccountMutation.isPending,
+    },
+    updateUser: {
+      mutate: updateUserMutation.mutate,
+      isLoading: updateUserMutation.isPending,
+    },
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -112,11 +89,19 @@ export function useAuth() {
 }
 
 export function useSession() {
-  const { session, isLoading } = useAuth();
-  return { data: session, isLoading };
+  const sessionQuery = useSessionQuery();
+  return {
+    data: sessionQuery.data,
+    isLoading: sessionQuery.isLoading,
+    error: sessionQuery.error,
+  };
 }
 
 export function useUser() {
-  const { user, isLoading } = useAuth();
-  return { data: user, isLoading };
+  const userQuery = useUserQuery();
+  return {
+    data: userQuery.data,
+    isLoading: userQuery.isLoading,
+    error: userQuery.error,
+  };
 }

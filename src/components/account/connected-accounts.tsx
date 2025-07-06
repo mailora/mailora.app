@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -15,42 +14,16 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/providers/auth-provider';
 import { Github, Mail, Link2, Unlink } from 'lucide-react';
-import { toast } from 'sonner';
 
 export function ConnectedAccounts() {
-  const { user, linkAccount } = useAuth();
-  const [isLinking, setIsLinking] = useState(false);
+  const { user, linkAccount, unlinkAccount } = useAuth();
 
-  const handleLinkAccount = async (provider: string) => {
-    try {
-      setIsLinking(true);
-      await linkAccount({ provider });
-      toast.success('Account linked successfully!', {
-        description: `Your ${provider} account has been connected.`,
-      });
-    } catch (error) {
-      console.error(`Error linking ${provider}:`, error);
-      toast.error(`Failed to link ${provider} account`, {
-        description: 'Please try again. Make sure you have the necessary permissions.',
-      });
-    } finally {
-      setIsLinking(false);
-    }
+  const handleLinkAccount = (provider: string) => {
+    linkAccount.mutate({ provider });
   };
 
-  const handleUnlinkAccount = async (provider: string) => {
-    try {
-      // This would need to be implemented with better-auth's unlink functionality
-      console.log(`Unlinking ${provider}`);
-      toast.success('Account disconnected', {
-        description: `Your ${provider} account has been disconnected.`,
-      });
-    } catch (error) {
-      console.error(`Error unlinking ${provider}:`, error);
-      toast.error(`Failed to disconnect ${provider} account`, {
-        description: 'Please try again later.',
-      });
-    }
+  const handleUnlinkAccount = (provider: string) => {
+    unlinkAccount.mutate({ provider });
   };
 
   if (!user) return null;
@@ -159,11 +132,11 @@ export function ConnectedAccounts() {
           <Button
             variant="outline"
             size="sm"
-            disabled={isLinking}
+            disabled={linkAccount.isLoading}
             onClick={() => handleLinkAccount('github')}
           >
             <Link2 className="mr-2 h-4 w-4" />
-            {isLinking ? 'Connecting...' : 'Connect'}
+            {linkAccount.isLoading ? 'Connecting...' : 'Connect'}
           </Button>
         )}
       </div>
@@ -219,11 +192,11 @@ export function ConnectedAccounts() {
           <Button
             variant="outline"
             size="sm"
-            disabled={isLinking}
+            disabled={linkAccount.isLoading}
             onClick={() => handleLinkAccount('microsoft')}
           >
             <Link2 className="mr-2 h-4 w-4" />
-            {isLinking ? 'Connecting...' : 'Connect'}
+            {linkAccount.isLoading ? 'Connecting...' : 'Connect'}
           </Button>
         )}
       </div>
