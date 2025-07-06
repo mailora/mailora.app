@@ -157,8 +157,13 @@ export function useUnlinkAccountMutation() {
         ...(params.accountId && { accountId: params.accountId }),
       });
     },
-    onSuccess: async (_, variables) => {
-      // Invalidate and refetch session data
+    onSuccess: async (data, variables) => {
+      if (data.error) {
+        toast.error(`Failed to unlink ${variables.provider} account`, {
+          description: data?.error?.message || 'Please try again later.',
+        });
+        return;
+      }
       await queryClient.invalidateQueries({ queryKey: authQueryKeys.session });
       await queryClient.invalidateQueries({ queryKey: authQueryKeys.user });
       await queryClient.invalidateQueries({ queryKey: authQueryKeys.accounts });

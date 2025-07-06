@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/providers/auth-provider';
+import { SaveIcon } from 'lucide-react';
 
 export function ProfileForm() {
   const { user, updateUser } = useAuth();
@@ -97,6 +98,7 @@ export function ProfileForm() {
 
       <div className="flex justify-end">
         <Button type="submit" disabled={updateUser.isLoading}>
+          <SaveIcon className="h-4 w-4" />
           {updateUser.isLoading ? 'Updating...' : 'Save Changes'}
         </Button>
       </div>
