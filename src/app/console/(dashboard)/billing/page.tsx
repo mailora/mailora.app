@@ -25,7 +25,6 @@ export default function BillingPage() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-muted-foreground">sumantablog@gmail.com</span>
             <ThemeToggle />
             <UserNav />
           </div>
