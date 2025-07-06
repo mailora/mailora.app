@@ -55,7 +55,7 @@ export function AppHeader({
             </Badge>
           )}
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
           {userEmail && (
             <span className="text-sm text-muted-foreground hidden md:inline-block">
               {userEmail}
