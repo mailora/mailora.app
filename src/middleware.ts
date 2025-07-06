@@ -6,7 +6,9 @@ export function middleware(req: NextRequest) {
 
   const isConsoleSubdomain = hostname.startsWith('console.');
 
-  if (isConsoleSubdomain) {
+  const isApiRoute = url.pathname.startsWith('/api/');
+
+  if (isConsoleSubdomain && !isApiRoute) {
     // If it's already prefixed with /console, don't double prefix
     if (!url.pathname.startsWith('/console')) {
       url.pathname = `/console${url.pathname}`;

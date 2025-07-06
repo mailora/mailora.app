@@ -26,6 +26,9 @@ export const env = createEnv({
     RESEND_API_KEY: z.string().optional(),
     EMAIL_FROM: z.string().optional(),
     ADMIN_EMAIL: z.string().email().optional(),
+    POLAR_ACCESS_TOKEN: z.string(),
+    POLAR_ENVIRONMENT: z.enum(['sandbox', 'production']).default('sandbox'),
+    POLAR_WEBHOOK_SECRET: z.string(),
   },
   client: {
     NEXT_PUBLIC_AUTH_URL: z.string().url().default('http://localhost:3000'),
@@ -57,5 +60,8 @@ export const env = createEnv({
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
     NEXT_PUBLIC_AUTH_URL: process.env.NEXT_PUBLIC_AUTH_URL,
     NEXT_PUBLIC_APP_DOMAIN: process.env.NEXT_PUBLIC_APP_DOMAIN,
+    POLAR_ACCESS_TOKEN: process.env.POLAR_ACCESS_TOKEN,
+    POLAR_ENVIRONMENT: process.env.POLAR_ENVIRONMENT,
+    POLAR_WEBHOOK_SECRET: process.env.POLAR_WEBHOOK_SECRET,
   },
 });
