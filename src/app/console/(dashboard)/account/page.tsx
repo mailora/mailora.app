@@ -2,7 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { MainLayout, PageHeader } from '@/components/layout';
 import { ProfileForm } from '@/components/account/profile-form';
 import { ConnectedAccounts } from '@/components/account/connected-accounts';
-import { User, Link2 } from 'lucide-react';
+import { SessionList } from '@/components/account/session-list';
+import { User, Link2, Shield } from 'lucide-react';
 
 export default function AccountPage() {
   return (
@@ -42,6 +43,22 @@ export default function AccountPage() {
           </CardHeader>
           <CardContent>
             <ConnectedAccounts />
+          </CardContent>
+        </Card>
+
+        {/* Session Management */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Shield className="mr-2 h-5 w-5" />
+              Session Management
+            </CardTitle>
+            <CardDescription>
+              Monitor and control your active sessions across all devices for enhanced security.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SessionList />
           </CardContent>
         </Card>
       </div>

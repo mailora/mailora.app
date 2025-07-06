@@ -9,6 +9,7 @@ export const authQueryKeys = {
   session: ['auth', 'session'] as const,
   user: ['auth', 'user'] as const,
   accounts: ['auth', 'accounts'] as const,
+  sessions: ['auth', 'sessions'] as const,
 } as const;
 
 // Accounts Query
@@ -20,6 +21,19 @@ export function useAccountsQuery() {
       return result.data || [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+  });
+}
+
+// Sessions Query
+export function useSessionsQuery() {
+  return useQuery({
+    queryKey: authQueryKeys.sessions,
+    queryFn: async () => {
+      const result = await authClient.listSessions();
+      return result.data || [];
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes (shorter for security)
     retry: 1,
   });
 }
@@ -174,6 +188,78 @@ export function useUnlinkAccountMutation() {
     onError: (error, variables) => {
       console.error(`Unlink account error:`, error);
       toast.error(`Failed to disconnect ${variables.provider} account`, {
+        description: 'Please try again later.',
+      });
+    },
+  });
+}
+
+// Revoke Session Mutation
+export function useRevokeSessionMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: { token: string }) => {
+      return await authClient.revokeSession({ token: params.token });
+    },
+    onSuccess: async () => {
+      // Invalidate sessions list
+      await queryClient.invalidateQueries({ queryKey: authQueryKeys.sessions });
+      toast.success('Session revoked successfully', {
+        description: 'The session has been logged out.',
+      });
+    },
+    onError: (error) => {
+      console.error('Revoke session error:', error);
+      toast.error('Failed to revoke session', {
+        description: 'Please try again later.',
+      });
+    },
+  });
+}
+
+// Revoke Other Sessions Mutation
+export function useRevokeOtherSessionsMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      return await authClient.revokeOtherSessions();
+    },
+    onSuccess: async () => {
+      // Invalidate sessions list
+      await queryClient.invalidateQueries({ queryKey: authQueryKeys.sessions });
+      toast.success('Other sessions revoked', {
+        description: 'All other devices have been logged out.',
+      });
+    },
+    onError: (error) => {
+      console.error('Revoke other sessions error:', error);
+      toast.error('Failed to revoke other sessions', {
+        description: 'Please try again later.',
+      });
+    },
+  });
+}
+
+// Revoke All Sessions Mutation
+export function useRevokeAllSessionsMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      return await authClient.revokeSessions();
+    },
+    onSuccess: () => {
+      // Clear all auth-related queries (user will be logged out)
+      queryClient.clear();
+      toast.success('All sessions revoked', {
+        description: 'You have been logged out from all devices.',
+      });
+    },
+    onError: (error) => {
+      console.error('Revoke all sessions error:', error);
+      toast.error('Failed to revoke all sessions', {
         description: 'Please try again later.',
       });
     },
