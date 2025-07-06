@@ -13,6 +13,7 @@ interface AuthContextType {
     social: (params: { provider: string }) => Promise<void>;
   };
   signOut: () => Promise<void>;
+  linkAccount: (params: { provider: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -72,6 +73,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const linkAccount = async (params: { provider: string }) => {
+    try {
+      setIsLoading(true);
+      await authClient.linkSocial(params);
+      // Refresh session after linking
+      const sessionData = await authClient.getSession();
+      if (sessionData.data) {
+        setSession(sessionData.data);
+        setUser(sessionData.data.user);
+      }
+    } catch (error) {
+      console.error('Link account error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const value: AuthContextType = {
     session,
     user,
@@ -79,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: !!session,
     signIn,
     signOut,
+    linkAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
