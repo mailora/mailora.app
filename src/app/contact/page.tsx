@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -28,34 +29,69 @@ export default function ContactPage() {
     email: '',
     subject: '',
     message: '',
-    company: '',
-    phone: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrors({});
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    setIsSubmitted(true);
-    setIsSubmitting(false);
-
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: '',
-        company: '',
-        phone: '',
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          subject: formData.subject.trim(),
+          message: formData.message.trim(),
+        }),
       });
-    }, 3000);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.code === 'VALIDATION_ERROR' && data.details) {
+          // Handle validation errors
+          const newErrors: Record<string, string> = {};
+          data.details.forEach((error: { field: string; message: string }) => {
+            newErrors[error.field] = error.message;
+          });
+          setErrors(newErrors);
+          toast.error('Please check your input and try again.');
+        } else {
+          toast.error(data.error || 'Something went wrong. Please try again later.');
+        }
+        return;
+      }
+
+      // Success
+      setIsSubmitted(true);
+      toast.success('Message sent successfully!', {
+        description: "We'll get back to you within 24 hours.",
+      });
+
+      // Reset form after 5 seconds
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        });
+      }, 5000);
+    } catch (error) {
+      console.error('Contact form error:', error);
+      toast.error('Network error. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -234,6 +270,7 @@ export default function ContactPage() {
                           placeholder="John Doe"
                           className="mt-1"
                         />
+                        {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                       </div>
                       <div>
                         <Label htmlFor="email">Email *</Label>
@@ -247,32 +284,9 @@ export default function ContactPage() {
                           placeholder="john@example.com"
                           className="mt-1"
                         />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="company">Company</Label>
-                        <Input
-                          id="company"
-                          name="company"
-                          value={formData.company}
-                          onChange={handleChange}
-                          placeholder="Your Company"
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="+1 (555) 123-4567"
-                          className="mt-1"
-                        />
+                        {errors.email && (
+                          <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                        )}
                       </div>
                     </div>
 
@@ -287,6 +301,9 @@ export default function ContactPage() {
                         placeholder="How can we help you?"
                         className="mt-1"
                       />
+                      {errors.subject && (
+                        <p className="text-red-500 text-sm mt-1">{errors.subject}</p>
+                      )}
                     </div>
 
                     <div>
@@ -298,9 +315,15 @@ export default function ContactPage() {
                         onChange={handleChange}
                         required
                         rows={5}
-                        placeholder="Tell us more about your needs..."
+                        placeholder="Tell us more about your needs... (minimum 10 characters)"
                         className="mt-1"
                       />
+                      {errors.message && (
+                        <p className="text-red-500 text-sm mt-1">{errors.message}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {formData.message.length}/2000 characters
+                      </p>
                     </div>
 
                     <Button

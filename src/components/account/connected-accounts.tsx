@@ -12,21 +12,50 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/providers/auth-provider';
-import { Github, Mail, Link2, Unlink } from 'lucide-react';
+import { useAccountsQuery } from '@/hooks/use-auth-queries';
+import { Github, Mail, Link2, Unlink, CheckCircle } from 'lucide-react';
 
 export function ConnectedAccounts() {
   const { user, linkAccount, unlinkAccount } = useAuth();
+  const { data: accounts = [], isLoading: accountsLoading } = useAccountsQuery();
 
   const handleLinkAccount = (provider: string) => {
     linkAccount.mutate({ provider });
   };
 
   const handleUnlinkAccount = (provider: string) => {
-    unlinkAccount.mutate({ provider });
+    unlinkAccount.mutate({
+      provider,
+    });
   };
 
   if (!user) return null;
+
+  if (accountsLoading) {
+    return (
+      <div className="space-y-4">
+        {['Google', 'GitHub', 'Microsoft'].map((provider) => (
+          <div key={provider} className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center animate-pulse" />
+              <div>
+                <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+                <div className="h-3 w-24 bg-muted rounded animate-pulse mt-1" />
+              </div>
+            </div>
+            <div className="w-20 h-8 bg-muted rounded animate-pulse" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Check if a provider is connected
+  const isProviderConnected = (provider: string) => {
+    return accounts.some((account: { provider: string }) => account.provider === provider);
+  };
 
   return (
     <div className="space-y-4">
@@ -53,37 +82,59 @@ export function ConnectedAccounts() {
               />
             </svg>
           </div>
-          <div>
-            <div className="font-medium">Google</div>
-            <div className="text-sm text-muted-foreground">Connected as {user.email}</div>
+          <div className="flex-1">
+            <div className="flex items-center space-x-2">
+              <span className="font-medium">Google</span>
+              {isProviderConnected('google') && (
+                <Badge variant="secondary" className="text-xs">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Connected
+                </Badge>
+              )}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {isProviderConnected('google') ? `Connected as ${user.email}` : 'Not connected'}
+            </div>
           </div>
         </div>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Unlink className="mr-2 h-4 w-4" />
-              Disconnect
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Disconnect Google Account?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will remove your Google account connection. You can always reconnect it later.
-                You&apos;ll need to use another connected account or email/password to sign in.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => handleUnlinkAccount('google')}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
+        {isProviderConnected('google') ? (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm">
+                <Unlink className="mr-2 h-4 w-4" />
                 Disconnect
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Disconnect Google Account?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will remove your Google account connection. You can always reconnect it
+                  later. Make sure you have another way to sign in to your account.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleUnlinkAccount('google')}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Disconnect
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={linkAccount.isLoading}
+            onClick={() => handleLinkAccount('google')}
+          >
+            <Link2 className="mr-2 h-4 w-4" />
+            {linkAccount.isLoading ? 'Connecting...' : 'Connect'}
+          </Button>
+        )}
       </div>
 
       {/* GitHub Account */}
@@ -92,19 +143,25 @@ export function ConnectedAccounts() {
           <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center">
             <Github className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <div className="font-medium">GitHub</div>
+          <div className="flex-1">
+            <div className="flex items-center space-x-2">
+              <span className="font-medium">GitHub</span>
+              {isProviderConnected('github') && (
+                <Badge variant="secondary" className="text-xs">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Connected
+                </Badge>
+              )}
+            </div>
             <div className="text-sm text-muted-foreground">
-              {/* In a real app, this would check if GitHub is connected */}
-              Not connected
+              {isProviderConnected('github') ? `Connected as ${user.email}` : 'Not connected'}
             </div>
           </div>
         </div>
-        {/* Show connect button when not connected, disconnect when connected */}
-        {false ? (
+        {isProviderConnected('github') ? (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="destructive" size="sm">
                 <Unlink className="mr-2 h-4 w-4" />
                 Disconnect
               </Button>
@@ -152,19 +209,25 @@ export function ConnectedAccounts() {
               <path fill="#ffb900" d="M13 13h10v10H13z" />
             </svg>
           </div>
-          <div>
-            <div className="font-medium">Microsoft</div>
+          <div className="flex-1">
+            <div className="flex items-center space-x-2">
+              <span className="font-medium">Microsoft</span>
+              {isProviderConnected('microsoft') && (
+                <Badge variant="secondary" className="text-xs">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Connected
+                </Badge>
+              )}
+            </div>
             <div className="text-sm text-muted-foreground">
-              {/* In a real app, this would check if Microsoft is connected */}
-              Not connected
+              {isProviderConnected('microsoft') ? `Connected as ${user.email}` : 'Not connected'}
             </div>
           </div>
         </div>
-        {/* Show connect button when not connected, disconnect when connected */}
-        {false ? (
+        {isProviderConnected('microsoft') ? (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="destructive" size="sm">
                 <Unlink className="mr-2 h-4 w-4" />
                 Disconnect
               </Button>

@@ -11,6 +11,19 @@ export const authQueryKeys = {
   accounts: ['auth', 'accounts'] as const,
 } as const;
 
+// Accounts Query
+export function useAccountsQuery() {
+  return useQuery({
+    queryKey: authQueryKeys.accounts,
+    queryFn: async () => {
+      const result = await authClient.listAccounts();
+      return result.data || [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+  });
+}
+
 // Session Query
 export function useSessionQuery() {
   return useQuery({
@@ -115,7 +128,7 @@ export function useLinkAccountMutation() {
     mutationFn: async (params: { provider: string }) => {
       return await authClient.linkSocial(params);
     },
-    onSuccess: async (data, variables) => {
+    onSuccess: async (_, variables) => {
       // Invalidate and refetch session data
       await queryClient.invalidateQueries({ queryKey: authQueryKeys.session });
       await queryClient.invalidateQueries({ queryKey: authQueryKeys.user });
@@ -138,13 +151,13 @@ export function useUnlinkAccountMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (params: { provider: string }) => {
-      // Note: This would need to be implemented with better-auth's unlink functionality
-      // For now, we'll log the action
-      console.log(`Unlinking ${params.provider}`);
-      return Promise.resolve();
+    mutationFn: async (params: { provider: string; accountId?: string }) => {
+      return await authClient.unlinkAccount({
+        providerId: params.provider,
+        ...(params.accountId && { accountId: params.accountId }),
+      });
     },
-    onSuccess: async (data, variables) => {
+    onSuccess: async (_, variables) => {
       // Invalidate and refetch session data
       await queryClient.invalidateQueries({ queryKey: authQueryKeys.session });
       await queryClient.invalidateQueries({ queryKey: authQueryKeys.user });

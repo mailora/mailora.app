@@ -95,9 +95,11 @@ export function ProfileForm() {
         </div>
       </div>
 
-      <Button type="submit" disabled={updateUser.isLoading}>
-        {updateUser.isLoading ? 'Updating...' : 'Save Changes'}
-      </Button>
+      <div className="flex justify-end">
+        <Button type="submit" disabled={updateUser.isLoading}>
+          {updateUser.isLoading ? 'Updating...' : 'Save Changes'}
+        </Button>
+      </div>
     </form>
   );
 }
