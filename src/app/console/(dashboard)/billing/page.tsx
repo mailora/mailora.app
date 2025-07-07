@@ -1,8 +1,9 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Calendar, Check, CreditCard, Download, ExternalLink } from 'lucide-react';
+
 import { MainLayout, PageHeader } from '@/components/layout';
-import { CreditCard, Download, Calendar, Check, ExternalLink } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function BillingPage() {
   return (

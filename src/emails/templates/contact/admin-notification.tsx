@@ -1,15 +1,15 @@
-import React from 'react';
 import {
-  Html,
-  Head,
   Body,
   Container,
-  Section,
-  Text,
+  Head,
   Heading,
   Hr,
+  Html,
   Preview,
+  Section,
+  Text,
 } from '@react-email/components';
+import React from 'react';
 
 interface AdminNotificationEmailProps {
   contactName: string;

@@ -1,4 +1,4 @@
-export { User, type IUser } from './user';
-export { Session, type ISession } from './session';
 export { Account, type IAccount } from './account';
-export { Verification, type IVerification } from './verification';
+export { type ISession, Session } from './session';
+export { type IUser, User } from './user';
+export { type IVerification, Verification } from './verification';

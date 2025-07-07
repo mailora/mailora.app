@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { connectToDatabase } from '@/db/mongoose';
+
 import Contact from '@/db/models/contact';
+import { connectToDatabase } from '@/db/mongoose';
 import { ContactEmailService } from '@/emails/services/contact-email';
 
 // Validation schema for contact form

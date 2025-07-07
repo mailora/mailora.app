@@ -1,9 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MainLayout, PageHeader } from '@/components/layout';
-import { ProfileForm } from '@/components/account/profile-form';
+import { Link2, Shield, User } from 'lucide-react';
+
 import { ConnectedAccounts } from '@/components/account/connected-accounts';
+import { ProfileForm } from '@/components/account/profile-form';
 import { SessionList } from '@/components/account/session-list';
-import { User, Link2, Shield } from 'lucide-react';
+import { MainLayout, PageHeader } from '@/components/layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function AccountPage() {
   return (

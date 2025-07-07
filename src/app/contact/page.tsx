@@ -1,26 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import {
+  ArrowLeft,
+  CheckCircle,
+  Github,
+  Linkedin,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Phone,
+  Send,
+  Twitter,
+} from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { toast } from 'sonner';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import {
-  Mail,
-  Phone,
-  MapPin,
-  ArrowLeft,
-  Send,
-  MessageSquare,
-  CheckCircle,
-  Twitter,
-  Linkedin,
-  Github,
-} from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import AppConfig from '@/lib/app-config';
 
 export default function ContactPage() {

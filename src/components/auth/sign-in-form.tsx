@@ -1,9 +1,10 @@
 'use client';
 
-import { useAuth } from '@/providers/auth-provider';
-import { Button } from '@/components/ui/button';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/providers/auth-provider';
 
 export function SignInForm() {
   const { signIn, isAuthenticated } = useAuth();

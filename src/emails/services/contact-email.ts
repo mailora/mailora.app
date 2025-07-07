@@ -1,8 +1,10 @@
-import { resend, EMAIL_CONFIG, isEmailConfigured } from '@/lib/resend';
+import { render } from '@react-email/render';
+
 import { IContact } from '@/db/models/contact';
+import { EMAIL_CONFIG, isEmailConfigured, resend } from '@/lib/resend';
+
 import AdminNotificationEmail from '../templates/contact/admin-notification';
 import UserConfirmationEmail from '../templates/contact/user-confirmation';
-import { render } from '@react-email/render';
 
 export interface ContactEmailData {
   contact: IContact;

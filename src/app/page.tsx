@@ -1,19 +1,20 @@
+import {
+  ArrowRight,
+  Bot,
+  Check,
+  Clock,
+  Globe,
+  Mail,
+  Shield,
+  Star,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import {
-  Mail,
-  ArrowRight,
-  Check,
-  Star,
-  Users,
-  Shield,
-  Bot,
-  Globe,
-  TrendingUp,
-  Clock,
-} from 'lucide-react';
 import AppConfig from '@/lib/app-config';
 
 export default function LandingPage() {

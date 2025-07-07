@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+
 import { AppHeader } from './app-header';
 
 interface ChatLayoutProps {
@@ -20,9 +21,9 @@ interface ChatLayoutProps {
 
 export function ChatLayout({ children, header, className }: ChatLayoutProps) {
   return (
-    <div className={cn('min-h-screen bg-background flex flex-col', className)}>
+    <div className={cn('flex flex-col h-screen bg-background', className)}>
       <AppHeader {...header} />
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">{children}</div>
+      <div className="flex-1 min-h-0">{children}</div>
     </div>
   );
 }

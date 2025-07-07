@@ -1,8 +1,9 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
+
+import { authClient } from '@/lib/auth-client';
 
 // Query Keys
 export const authQueryKeys = {

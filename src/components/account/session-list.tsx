@@ -1,7 +1,19 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { formatDistanceToNow } from 'date-fns';
+import {
+  Chrome,
+  Clock,
+  Globe,
+  LogOut,
+  MapPin,
+  Monitor,
+  Shield,
+  Smartphone,
+  Tablet,
+  Trash2,
+} from 'lucide-react';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,25 +25,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
-  useSessionsQuery,
-  useRevokeSessionMutation,
-  useRevokeOtherSessionsMutation,
   useRevokeAllSessionsMutation,
+  useRevokeOtherSessionsMutation,
+  useRevokeSessionMutation,
+  useSessionsQuery,
 } from '@/hooks/use-auth-queries';
-import {
-  Monitor,
-  Smartphone,
-  Tablet,
-  Chrome,
-  Globe,
-  LogOut,
-  MapPin,
-  Clock,
-  Shield,
-  Trash2,
-} from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
 
 interface Session {
   id: string;

@@ -1,17 +1,18 @@
 'use client';
 
 import React, { createContext, useContext } from 'react';
+
 import {
   useAuth as useAuthQuery,
+  useLinkAccountMutation,
   useSession as useSessionQuery,
-  useUser as useUserQuery,
   useSignInMutation,
   useSignOutMutation,
-  useLinkAccountMutation,
   useUnlinkAccountMutation,
   useUpdateUserMutation,
+  useUser as useUserQuery,
 } from '@/hooks/use-auth-queries';
-import { User, Session } from '@/lib/auth';
+import { Session, User } from '@/lib/auth';
 
 interface AuthContextType {
   session: Session | null;

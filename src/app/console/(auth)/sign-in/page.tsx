@@ -1,8 +1,9 @@
+import { ArrowLeft, Mail } from 'lucide-react';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mail, ArrowLeft } from 'lucide-react';
-import { redirectIfAuthenticated } from '@/lib/auth-server';
+
 import { SignInForm } from '@/components/auth/sign-in-form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { redirectIfAuthenticated } from '@/lib/auth-server';
 
 export default async function AuthPage() {
   // Redirect if already authenticated

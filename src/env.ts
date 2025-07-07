@@ -29,6 +29,7 @@ export const env = createEnv({
     POLAR_ACCESS_TOKEN: z.string(),
     POLAR_ENVIRONMENT: z.enum(['sandbox', 'production']).default('sandbox'),
     POLAR_WEBHOOK_SECRET: z.string(),
+    GOOGLE_GENERATIVE_AI_API_KEY: z.string(),
   },
   client: {
     NEXT_PUBLIC_AUTH_URL: z.string().url().default('http://localhost:3000'),
@@ -63,5 +64,6 @@ export const env = createEnv({
     POLAR_ACCESS_TOKEN: process.env.POLAR_ACCESS_TOKEN,
     POLAR_ENVIRONMENT: process.env.POLAR_ENVIRONMENT,
     POLAR_WEBHOOK_SECRET: process.env.POLAR_WEBHOOK_SECRET,
+    GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
   },
 });

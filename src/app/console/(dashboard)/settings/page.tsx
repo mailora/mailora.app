@@ -1,7 +1,9 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Bell } from 'lucide-react';
+
+import { MainLayout, PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -10,8 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { MainLayout, PageHeader } from '@/components/layout';
-import { Bell } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 export default function SettingsPage() {
   return (

@@ -1,6 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { CheckCircle, Github, Link2, Mail, Unlink } from 'lucide-react';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,9 +14,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/providers/auth-provider';
+import { Button } from '@/components/ui/button';
 import { useAccountsQuery } from '@/hooks/use-auth-queries';
-import { Github, Mail, Link2, Unlink, CheckCircle } from 'lucide-react';
+import { useAuth } from '@/providers/auth-provider';
 
 export function ConnectedAccounts() {
   const { user, linkAccount, unlinkAccount } = useAuth();
