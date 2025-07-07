@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface Conversation {
   _id: string;
@@ -37,6 +37,24 @@ export function useConversations() {
       }
       return response.json();
     },
+  });
+}
+
+export function useConversationsInfinite() {
+  return useInfiniteQuery({
+    queryKey: ['conversations', 'infinite'],
+    queryFn: async ({ pageParam = 0 }) => {
+      const response = await fetch(`/api/conversations?page=${pageParam}&limit=20`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch conversations');
+      }
+      return response.json();
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < 20) return undefined;
+      return allPages.length;
+    },
+    initialPageParam: 0,
   });
 }
 

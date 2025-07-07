@@ -126,6 +126,10 @@ Guidelines:
           }
         }
       },
+      experimental_telemetry: {
+        isEnabled: true,
+        functionId: 'chat-response',
+      },
     });
 
     return result.toDataStreamResponse();
