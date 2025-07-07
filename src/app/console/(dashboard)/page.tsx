@@ -1,9 +1,23 @@
 'use client';
 
 import { useChat } from 'ai/react';
-import { Copy, Mail, Mic, Plus, Send } from 'lucide-react';
+import { Bot, Clock, Copy, Cpu, Mail, Mic, Plus, Send, User, Zap } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
+
+interface MessageTokens {
+  input: number;
+  output: number;
+  total: number;
+}
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  tokens?: MessageTokens;
+  timeTaken?: number;
+}
 import { useEffect, useRef, useState } from 'react';
 
 import { ChatLayout } from '@/components/layout';
@@ -46,6 +60,10 @@ export default function AIChatPage() {
       emailType,
       tone,
     },
+    onFinish: () => {
+      // Refresh conversations list when a new conversation is created
+      window.location.reload();
+    },
   });
 
   const scrollToBottom = () => {
@@ -56,10 +74,17 @@ export default function AIChatPage() {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const handleCopy = async (content: string) => {
+  const [copySuccess, setCopySuccess] = useState<{ [key: string]: boolean }>({});
+
+  const handleCopy = async (content: string, messageId: string) => {
     try {
       await navigator.clipboard.writeText(content);
-      // Could add toast notification here if needed
+      setCopySuccess((prev) => ({ ...prev, [messageId]: true }));
+
+      // Reset success state after 2 seconds
+      setTimeout(() => {
+        setCopySuccess((prev) => ({ ...prev, [messageId]: false }));
+      }, 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -93,38 +118,233 @@ export default function AIChatPage() {
                 </div>
               ) : (
                 messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-3xl ${
-                        message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-muted'
-                      } rounded-lg p-4 shadow-sm`}
-                    >
-                      {message.role === 'assistant' ? (
-                        <div className="space-y-4">
-                          <div className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-                            {message.content}
+                  <div key={message.id} className="flex gap-3 max-w-4xl">
+                    {/* Avatar */}
+                    <div className="flex-shrink-0">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          message.role === 'user'
+                            ? 'bg-blue-600'
+                            : 'bg-gradient-to-br from-purple-500 to-indigo-600'
+                        }`}
+                      >
+                        {message.role === 'user' ? (
+                          <User className="h-4 w-4 text-white" />
+                        ) : (
+                          <Bot className="h-4 w-4 text-white" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Message Content */}
+                    <div className="flex-1 min-w-0">
+                      <div
+                        className={`rounded-2xl px-4 py-3 ${
+                          message.role === 'user'
+                            ? 'bg-blue-600 text-white ml-auto max-w-lg'
+                            : 'bg-card border shadow-sm'
+                        }`}
+                      >
+                        {message.role === 'assistant' ? (
+                          <div className="space-y-4">
+                            <div className="relative">
+                              {(() => {
+                                // Try to parse as JSON first
+                                try {
+                                  // Remove any potential markdown code blocks
+                                  const cleanContent = message.content
+                                    .replace(/```json\n?|\n?```/g, '')
+                                    .trim();
+                                  const parsed = JSON.parse(cleanContent);
+
+                                  if (parsed.subject && parsed.body) {
+                                    return (
+                                      <div className="space-y-2">
+                                        {/* Compact Subject */}
+                                        <div className="bg-blue-50/70 dark:bg-blue-950/30 border-l-4 border-blue-400 px-3 py-2 rounded-r-lg">
+                                          <div className="flex items-center gap-2 mb-1">
+                                            <Mail className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                                            <span className="text-xs font-medium text-blue-700 dark:text-blue-400 uppercase tracking-wide">
+                                              Subject
+                                            </span>
+                                          </div>
+                                          <div className="font-semibold text-blue-900 dark:text-blue-100 text-sm">
+                                            {parsed.subject}
+                                          </div>
+                                        </div>
+
+                                        {/* Compact Body */}
+                                        <div className="bg-green-50/70 dark:bg-green-950/30 border-l-4 border-green-400 px-3 py-2 rounded-r-lg">
+                                          <div className="flex items-center gap-2 mb-1">
+                                            <Send className="h-3 w-3 text-green-600 dark:text-green-400" />
+                                            <span className="text-xs font-medium text-green-700 dark:text-green-400 uppercase tracking-wide">
+                                              Body
+                                            </span>
+                                          </div>
+                                          <div className="whitespace-pre-wrap text-green-900 dark:text-green-100 text-sm leading-relaxed">
+                                            {parsed.body}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                } catch {
+                                  // If JSON parsing fails, check if it's a partial JSON response
+                                  const content = message.content.trim();
+                                  if (content.startsWith('{') && !content.endsWith('}')) {
+                                    return (
+                                      <div className="bg-amber-50/70 dark:bg-amber-950/30 border-l-4 border-amber-400 px-3 py-2 rounded-r-lg">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <div className="animate-spin rounded-full h-3 w-3 border-2 border-amber-600 border-t-transparent"></div>
+                                          <span className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">
+                                            Generating...
+                                          </span>
+                                        </div>
+                                        <div className="text-sm text-amber-800 dark:text-amber-200 font-mono">
+                                          {content}
+                                        </div>
+                                      </div>
+                                    );
+                                  }
+                                }
+
+                                // Fallback to display as-is
+                                return (
+                                  <div className="text-sm text-foreground leading-relaxed">
+                                    {message.content}
+                                  </div>
+                                );
+                              })()}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-wrap gap-2">
+                              {(() => {
+                                try {
+                                  const cleanContent = message.content
+                                    .replace(/```json\n?|\n?```/g, '')
+                                    .trim();
+                                  const parsed = JSON.parse(cleanContent);
+
+                                  if (parsed.subject && parsed.body) {
+                                    return (
+                                      <>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className="bg-white/80 hover:bg-blue-50 border-blue-200 text-blue-700 hover:text-blue-800"
+                                          onClick={() =>
+                                            handleCopy(parsed.subject, `${message.id}-subject`)
+                                          }
+                                        >
+                                          <Copy className="mr-2 h-4 w-4" />
+                                          {copySuccess[`${message.id}-subject`]
+                                            ? 'Copied!'
+                                            : 'Copy Subject'}
+                                        </Button>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className="bg-white/80 hover:bg-emerald-50 border-emerald-200 text-emerald-700 hover:text-emerald-800"
+                                          onClick={() =>
+                                            handleCopy(parsed.body, `${message.id}-body`)
+                                          }
+                                        >
+                                          <Copy className="mr-2 h-4 w-4" />
+                                          {copySuccess[`${message.id}-body`]
+                                            ? 'Copied!'
+                                            : 'Copy Body'}
+                                        </Button>
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className="bg-white/80 hover:bg-purple-50 border-purple-200 text-purple-700 hover:text-purple-800"
+                                          onClick={() =>
+                                            handleCopy(
+                                              `Subject: ${parsed.subject}\n\n${parsed.body}`,
+                                              `${message.id}-full`
+                                            )
+                                          }
+                                        >
+                                          <Copy className="mr-2 h-4 w-4" />
+                                          {copySuccess[`${message.id}-full`]
+                                            ? 'Copied!'
+                                            : 'Copy All'}
+                                        </Button>
+                                      </>
+                                    );
+                                  }
+                                } catch {
+                                  // Fallback to original copy button
+                                }
+
+                                return (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="bg-white/80 hover:bg-gray-50 border-gray-200"
+                                    onClick={() => handleCopy(message.content, message.id)}
+                                  >
+                                    <Copy className="mr-2 h-4 w-4" />
+                                    {copySuccess[message.id] ? 'Copied!' : 'Copy'}
+                                  </Button>
+                                );
+                              })()}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="bg-white/80 hover:bg-indigo-50 border-indigo-200 text-indigo-700 hover:text-indigo-800"
+                              >
+                                <Send className="mr-2 h-4 w-4" />
+                                Use Email
+                              </Button>
+                            </div>
+
+                            {/* Compact Performance Metrics */}
+                            {(() => {
+                              const chatMessage = message as unknown as ChatMessage;
+                              if (!chatMessage.timeTaken && !chatMessage.tokens) return null;
+
+                              return (
+                                <div className="bg-muted/50 border rounded-lg px-3 py-2 mt-2">
+                                  <div className="flex items-center justify-between text-xs">
+                                    <div className="flex items-center gap-3">
+                                      {chatMessage.timeTaken && (
+                                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                                          <Clock className="h-3 w-3" />
+                                          <span className="font-medium">
+                                            {(chatMessage.timeTaken / 1000).toFixed(2)}s
+                                          </span>
+                                        </div>
+                                      )}
+                                      {chatMessage.tokens && (
+                                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                                          <Cpu className="h-3 w-3" />
+                                          <span className="font-medium">
+                                            {chatMessage.tokens.total}
+                                          </span>
+                                          <span className="text-green-600">
+                                            ↑{chatMessage.tokens.input}
+                                          </span>
+                                          <span className="text-blue-600">
+                                            ↓{chatMessage.tokens.output}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-1 text-muted-foreground">
+                                      <Zap className="h-3 w-3 text-amber-500" />
+                                      <span className="font-medium">AI</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })()}
                           </div>
-                          <div className="flex space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleCopy(message.content)}
-                            >
-                              <Copy className="mr-2 h-4 w-4" />
-                              Copy
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <Send className="mr-2 h-4 w-4" />
-                              Use Email
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-sm">{message.content}</div>
-                      )}
+                        ) : (
+                          <div className="text-sm">{message.content}</div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))
